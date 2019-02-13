@@ -4,29 +4,29 @@
 #include "Vector3.h"
 #include "Mtx44.h"
 #include "Application.h"
+#include "GameObject.h"
+#include "Environment.h"
 
-class Vehicle
+class Vehicle : public GameObject
 {
 public:
 	Vehicle();
 	~Vehicle();
-	void Init(const Vector3&, const Vector3&, const Vector3&);
-	void Update(double);
-
-	float getX();
-	float getY();
-	float getZ();
-
-	float getTargetX();
-	float getTargetY();
-	float getTargetZ();
-	Vector3 Up;
+	void Init(const Vector3&, const Vector3&, const Vector3&, float);
+	virtual void Update(double) = 0;
+	bool Collision(Environment&);
+	bool Collision(Vehicle&);
+	void ReverseSpeed();
+	Vector3 getTarget();
 
 	float getRotateValue();
+	float dist;
+	float distcheck;
+	float angle;
 
-private:
-	Vector3 Position;
+protected:
 	Vector3 Target;
+	Vector3 Up;
 	Vector3 DefaultPosition;
 	Vector3 DefaultTarget;
 	Vector3 DefaultUp;

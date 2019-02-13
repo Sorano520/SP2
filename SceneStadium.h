@@ -10,6 +10,10 @@
 #include "Light.h"
 #include "PositionCamera.h"
 #include "Vehicle.h"
+#include "GameObject.h"
+#include "Environment.h"
+#include "Player.h"
+#include "AIKart.h"
 
 class SceneText : public Scene
 {
@@ -51,6 +55,9 @@ public:
 		GEO_GROUND,
 		GEO_CHARACTER,
 		GEO_KART,
+		GEO_KART2,
+		GEO_KART3,
+		GEO_KART4,
 		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
@@ -168,7 +175,9 @@ private:
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 
-	Vehicle Car;
+	Player Car;
+	AIKart Kart3, Kart4;
+	Environment Seat;
 };
 
 #endif

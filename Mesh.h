@@ -25,7 +25,7 @@ public:
 	~Mesh();
 	void Render();
 	void Render(unsigned offset, unsigned count);
-
+	void setValues(float XCoord[2], float YCoord[2], float ZCoord[2]);
 	const std::string name;
 	DRAW_MODE mode;
 	Material material;
@@ -34,6 +34,9 @@ public:
 	unsigned indexBuffer;
 	unsigned indexSize;
 	unsigned textureID;
+	float XCoord[2];
+	float YCoord[2];
+	float ZCoord[2];
 };
 
 #endif

@@ -29,8 +29,7 @@ void SceneText::Init()
 	LightOn = true;
 	ballRY = 0.f;
 	ballT = 0.f;
-
-	Car.Init(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0));
+	
 
 	CameraOBJ[0].Set(-19.414f, 3.f, 25.14f, 0.f, -240.f, 0.f);
 	CameraOBJ[1].Set(-20.791f, 3.f, 3.573f, 0.f, -270.f, 0.f);
@@ -196,7 +195,23 @@ void SceneText::Init()
 	meshList[GEO_CHARACTER] = MeshBuilder::GenerateOBJ("character", "OBJ//character.obj");
 	meshList[GEO_CHARACTER]->textureID = LoadTGA("Image//character.tga");
 	meshList[GEO_KART] = MeshBuilder::GenerateOBJ("Kart", "OBJ//Kart1.obj");
-	meshList[GEO_KART]->textureID = LoadTGA("Image//character.tga");
+	meshList[GEO_KART]->textureID = LoadTGA("Image//Kart1.tga");
+	meshList[GEO_KART2] = MeshBuilder::GenerateOBJ("Kart2", "OBJ//Kart2.obj");
+	meshList[GEO_KART2]->textureID = LoadTGA("Image//Kart2.tga");
+	meshList[GEO_KART3] = MeshBuilder::GenerateOBJ("Kart3", "OBJ//Kart3.obj");
+	meshList[GEO_KART3]->textureID = LoadTGA("Image//Kart3.tga");
+	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart3", "OBJ//Kart4.obj");
+	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart3.tga");
+
+	Car.Init(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0), 0.f);
+	Car.setHitBox(meshList[GEO_KART]->XCoord, meshList[GEO_KART]->YCoord, meshList[GEO_KART]->ZCoord);
+	Seat.Init(Vector3(10, 0, 0));
+	Seat.setHitBox(meshList[GEO_KART2]->XCoord, meshList[GEO_KART2]->YCoord, meshList[GEO_KART2]->ZCoord);
+	Kart3.Init(Vector3(-10, 0, 0), Vector3(-10, 0, 1), Vector3(0, 1, 0), 0.f);
+	Kart3.setHitBox(meshList[GEO_KART3]->XCoord, meshList[GEO_KART3]->YCoord, meshList[GEO_KART3]->ZCoord);
+	Kart4.Init(Vector3(0, 0, 10), Vector3(0, 0, 11), Vector3(0, 1, 0), 0.f);
+	Kart4.setHitBox(meshList[GEO_KART4]->XCoord, meshList[GEO_KART4]->YCoord, meshList[GEO_KART4]->ZCoord);
+
 	// Text files
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
@@ -548,11 +563,12 @@ void SceneText::Update(double dt)
 			ballRY -= (float)(LSPEED * dt);
 		}
 	}
-	camera.Update(dt, Car);
-	camera.target.x = Car.getTargetX();
-	camera.target.z = Car.getTargetZ();
-	camera.position.z = Car.getZ() - 10;
+	Car.Collision(Kart3);
+	Car.Collision(Kart4);
 	Car.Update(dt);
+	Kart3.Update(dt);
+	Kart4.Update(dt);
+	camera.Update(dt, Car);
 	FPS = 1.0 / dt;
 }
 
@@ -674,16 +690,27 @@ void SceneText::Render()
 
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with new MVP
 	//RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PushMatrix();
-		modelStack.Translate(Car.getX(), Car.getY(), Car.getZ());
-		//modelStack.Rotate(Car.getTargetX(), 0, 1, 0);
-		//modelStack.Rotate((Car.getTargetZ() - Car.getZ()) * 90, 0, 1, 0);
-		modelStack.Rotate(Car.getRotateValue() + 90, 0, 1, 0);
-		modelStack.Scale(0.2, 0.2, 0.2);
-		RenderMesh(meshList[GEO_KART], LightOn);
-	modelStack.PopMatrix();
 	SceneText::RenderSkybox(modelStack, projectionStack, viewStack, MVP);
 	SceneText::RenderStadium(modelStack, projectionStack, viewStack, MVP);
+	modelStack.PushMatrix();
+		modelStack.Translate(Car.getPosition().x, Car.getPosition().y, Car.getPosition().z);
+		//modelStack.Rotate(Car.getTargetX(), 0, 1, 0);
+		//modelStack.Rotate((Car.getTargetZ() - Car.getZ()) * 90, 0, 1, 0);
+		modelStack.Rotate(Car.getRotateValue(), 0, 1, 0);
+		RenderMesh(meshList[GEO_KART], LightOn);
+	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+		modelStack.Translate(Seat.getPosition().x, Seat.getPosition().y, Seat.getPosition().z);
+		RenderMesh(meshList[GEO_KART2], LightOn);
+	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+		modelStack.Translate(Kart3.getPosition().x, Kart3.getPosition().y, Kart3.getPosition().z);
+		RenderMesh(meshList[GEO_KART3], LightOn);
+	modelStack.PopMatrix();
+	modelStack.PushMatrix();
+		modelStack.Translate(Kart4.getPosition().x, Kart4.getPosition().y, Kart4.getPosition().z);
+		RenderMesh(meshList[GEO_KART4], LightOn);
+	modelStack.PopMatrix();
 	SceneText::RenderInformation(modelStack, projectionStack, viewStack, MVP);
 }
 void SceneText::RenderStadium(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
@@ -802,13 +829,11 @@ void SceneText::RenderInformation(MS &modelStack, MS &projectionStack, MS &viewS
 	{
 		RenderTextOnScreen(meshList[GEO_TEXT], "C:Cycle camera", Color(1, 0, 0), 2, 1, 56 / 2);
 		RenderTextOnScreen(meshList[GEO_TEXT], "G:Change Field", Color(1, 0, 0), 2, 1, 54 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Cx:" + std::to_string(camera.position.x), Color(1, 0, 0), 2, 1, 52 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Cz:" + std::to_string(camera.position.z), Color(1, 0, 0), 2, 1, 50 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "tx:" + std::to_string(Car.getTargetX() - Car.getX()), Color(1, 0, 0), 2, 1, 48 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "tz:" + std::to_string(Car.getTargetZ() - Car.getZ()), Color(1, 0, 0), 2, 1, 46 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "vx:" + std::to_string(Car.Up.x), Color(1, 0, 0), 2, 1, 44 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "vz:" + std::to_string(Car.Up.z), Color(1, 0, 0), 2, 1, 42 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getRotateValue()), Color(1, 0, 0), 2, 1, 40 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getPosition().x - Car.getTarget().x), Color(1, 0, 0), 2, 1, 52 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getTarget().z - Car.getPosition().z), Color(1, 0, 0), 2, 1, 50 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getRotateValue()), Color(1, 0, 0), 2, 1, 44 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.dist), Color(1, 0, 0), 2, 1, 42 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.distcheck), Color(1, 0, 0), 2, 1, 40 / 2);
 	}
 }
 

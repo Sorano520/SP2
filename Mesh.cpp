@@ -152,3 +152,13 @@ void Mesh::Render(unsigned offset, unsigned count)
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 }
+
+void Mesh::setValues(float XCoord[2], float YCoord[2], float ZCoord[2])
+{
+	for (int Num = 0; Num < 2; Num++)
+	{
+		this->XCoord[Num] = XCoord[Num];
+		this->YCoord[Num] = YCoord[Num];
+		this->ZCoord[Num] = ZCoord[Num];
+	}
+}

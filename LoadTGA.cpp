@@ -55,10 +55,14 @@ GLuint LoadTGA(const char *file_path)				// load TGA file to memory
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	glGenerateMipmap(GL_TEXTURE_2D);	float maxAnisotropy = 1.f;
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	float maxAnisotropy = 1.f;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-		(GLint)maxAnisotropy);
+		(GLint)maxAnisotropy);
+
+
 	//end of modifiable code
 
 	delete []data;

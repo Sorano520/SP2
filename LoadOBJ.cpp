@@ -8,7 +8,8 @@ bool LoadOBJ(
 	const char *file_path, 
 	std::vector<Position> & out_vertices, 
 	std::vector<TexCoord> & out_uvs, 
-	std::vector<Vector3> & out_normals
+	std::vector<Vector3> & out_normals,
+	float (XCoord[2]), float (YCoord[2]), float (ZCoord[2])
 )
 {
 	std::ifstream fileStream(file_path,
@@ -31,6 +32,30 @@ bool LoadOBJ(
 		{
 			Position vertex;
 			sscanf_s((buf + 2), "%f%f%f", &vertex.x, &vertex.y, &vertex.z);
+			if (vertex.x < XCoord[0])
+			{
+				XCoord[0] = vertex.x;
+			}
+			else if (vertex.x > XCoord[1])
+			{
+				XCoord[1] = vertex.x;
+			}
+			if (vertex.y < YCoord[0])
+			{
+				YCoord[0] = vertex.y;
+			}
+			else if (vertex.y > YCoord[1])
+			{
+				YCoord[1] = vertex.y;
+			}
+			if (vertex.z < ZCoord[0])
+			{
+				ZCoord[0] = vertex.z;
+			}
+			else if (vertex.z > ZCoord[1])
+			{
+				ZCoord[1] = vertex.z;
+			}
 			temp_vertices.push_back(vertex);
 		}
 		else if (strncmp("vt ", buf, 3) == 0) //process texcoord(Check next Slide)

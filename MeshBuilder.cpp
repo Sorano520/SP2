@@ -1066,8 +1066,11 @@ Mesh* MeshBuilder::GenerateOBJ(const std::string &meshName, const std::string &f
 	std::vector<Position> vertices;
 	std::vector<TexCoord> uvs;
 	std::vector<Vector3> normals;
+	float tempX[2] = { 0.f, 0.f };
+	float tempY[2] = { 0.f, 0.f };
+	float tempZ[2] = { 0.f, 0.f };
 	bool success = LoadOBJ(file_path.c_str(), vertices,
-		uvs, normals);
+		uvs, normals, tempX, tempY, tempZ);
 	if (!success)
 		return NULL;
 	//Index the vertices, texcoords & normals properly
@@ -1077,7 +1080,11 @@ Mesh* MeshBuilder::GenerateOBJ(const std::string &meshName, const std::string &f
 	//Create the mesh and call glBindBuffer, glBufferData
 	//Use triangle list and remember to set index size
 	Mesh *mesh = new Mesh(meshName);
-
+	mesh->setValues(tempX, tempY, tempZ);
+	std::cout << meshName << std::endl;
+	std::cout << "XSmall: " << mesh->XCoord[0] << " " << "XBig: " << mesh->XCoord[1] << std::endl;
+	std::cout << "YSmall: " << mesh->YCoord[0] << " " << "YBig: " << mesh->YCoord[1] << std::endl;
+	std::cout << "ZSmall: " << mesh->ZCoord[0] << " " << "ZBig: " << mesh->ZCoord[1] << std::endl;
 	mesh->mode = Mesh::DRAW_TRIANGLES;
 	// Set the current active buffer
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);

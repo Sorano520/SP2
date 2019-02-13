@@ -9,7 +9,8 @@ bool LoadOBJ(
 	const char *file_path, 
 	std::vector<Position> & out_vertices, 
 	std::vector<TexCoord> & out_uvs, 
-	std::vector<Vector3> & out_normals
+	std::vector<Vector3> & out_normals,
+	float (XCoord[2]), float (YCoord[2]), float (ZCoord[2])
 );
 
 void IndexVBO(
