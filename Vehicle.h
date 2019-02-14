@@ -17,6 +17,7 @@ public:
 	bool Collision(Environment&);
 	bool Collision(Vehicle&);
 	void ReverseSpeed();
+	void Reset();
 	Vector3 getTarget();
 
 	float getRotateValue();

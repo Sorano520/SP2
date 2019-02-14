@@ -177,3 +177,13 @@ void Vehicle::ReverseSpeed()
 	SpeedXAxis *= -1;
 	SpeedZAxis *= -0.5;
 }
+
+
+void Vehicle::Reset()
+{
+	setPosition(DefaultPosition);
+	Target = DefaultTarget;
+	Up = DefaultUp;
+	RotateValue = 0.f;
+	SpeedZAxis = SpeedXAxis = 0.f;
+}

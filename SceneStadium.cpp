@@ -200,8 +200,8 @@ void SceneText::Init()
 	meshList[GEO_KART2]->textureID = LoadTGA("Image//Kart2.tga");
 	meshList[GEO_KART3] = MeshBuilder::GenerateOBJ("Kart3", "OBJ//Kart3.obj");
 	meshList[GEO_KART3]->textureID = LoadTGA("Image//Kart3.tga");
-	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart3", "OBJ//Kart4.obj");
-	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart3.tga");
+	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart4", "OBJ//Kart4.obj");
+	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart4.tga");
 
 	Car.Init(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0), 0.f);
 	Car.setHitBox(meshList[GEO_KART]->XCoord, meshList[GEO_KART]->YCoord, meshList[GEO_KART]->ZCoord);
