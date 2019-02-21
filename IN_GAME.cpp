@@ -152,6 +152,10 @@ void IN_GAME::Init()
 	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart4", "OBJ//Kart4.obj");
 	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart4.tga");
 
+	// tga files
+	meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu Background", Color(0, 0, 0), 1, 1);
+	meshList[GEO_MENU]->textureID = LoadTGA("Image//back.tga");
+
 	// Text files
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
@@ -217,22 +221,22 @@ void IN_GAME::Update(double dt)
 {
 	ElapsedTime += dt;
 	rotateAngle += dt;
-	if (Application::IsKeyPressed(0x31))
-	{
-		glEnable(GL_CULL_FACE);
-	}
-	if (Application::IsKeyPressed(0x32))
-	{
-		glDisable(GL_CULL_FACE);
-	}
-	if (Application::IsKeyPressed(0x33))
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Fill mode
-	}
-	if (Application::IsKeyPressed(0x34))
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
-	}
+	//if (Application::IsKeyPressed(0x31))
+	//{
+	//	glEnable(GL_CULL_FACE);
+	//}
+	//if (Application::IsKeyPressed(0x32))
+	//{
+	//	glDisable(GL_CULL_FACE);
+	//}
+	//if (Application::IsKeyPressed(0x33))
+	//{
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Fill mode
+	//}
+	//if (Application::IsKeyPressed(0x34))
+	//{
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //wireframe mode
+	//}
 	if (!(BounceTime > ElapsedTime))
 	{
 		if (CarMenu)
@@ -245,6 +249,7 @@ void IN_GAME::Update(double dt)
 			else if (Application::IsKeyPressed(0x42))
 			{
 				CarMenu = false;
+				GameMenu = true;
 			}
 		}
 		MenuChange = true;
@@ -269,30 +274,46 @@ void IN_GAME::Render()
 
 void IN_GAME::RenderMenu(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
 {
+	float SKYBOXSIZE = 1500.f;
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 0.f, -(SKYBOXSIZE / 2.0f - 0.1f));
+	modelStack.Scale(SKYBOXSIZE, SKYBOXSIZE, SKYBOXSIZE);
+	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Rotate(90, 1, 0, 0);
+	RenderMesh(meshList[GEO_MENU], false);
+	modelStack.PopMatrix();
 	if (CarMenu)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "Select your vehicle", Color(0, 1, 0), 3, 8, 54 / 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Select your vehicle", Color(1, 1, 1), 3, 5, 48 / 3);
 		modelStack.PushMatrix();
-		modelStack.Translate(-15, 0, 0);
+		modelStack.Translate(-4.5, -1, -10);
 		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		modelStack.Scale(1, 1, 1);
 		RenderMesh(meshList[GEO_KART], LightOn);
 		modelStack.PopMatrix();
 		modelStack.PushMatrix();
-		modelStack.Translate(-5, 0, 0);
+		modelStack.Translate(-1.5, -1, -10);
 		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		modelStack.Scale(1, 1, 1);
 		RenderMesh(meshList[GEO_KART2], LightOn);
 		modelStack.PopMatrix();
 		modelStack.PushMatrix();
-		modelStack.Translate(5, 0, 0);
+		modelStack.Translate(1.5, -1, -10);
 		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		modelStack.Scale(1, 1, 1);
 		RenderMesh(meshList[GEO_KART3], LightOn);
 		modelStack.PopMatrix();
 		modelStack.PushMatrix();
-		modelStack.Translate(15, 0, 0);
+		modelStack.Translate(4.5, -1, -10);
 		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		modelStack.Scale(1, 1, 1);
 		RenderMesh(meshList[GEO_KART4], LightOn);
 		modelStack.PopMatrix();
-		RenderTextOnScreen(meshList[GEO_TEXT], "B:Back", Color(0, 1, 0), 2, 1, 1);
+		RenderTextOnScreen(meshList[GEO_TEXT], "1", Color(1, 1, 1), 3, 5, 15 / 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "2", Color(1, 1, 1), 3, 10.5, 15 / 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "3", Color(1, 1, 1), 3, 16.5, 15 / 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "4", Color(1, 1, 1), 3, 22, 15 / 3);
+		RenderTextOnScreen(meshList[GEO_TEXT], "B:Back", Color(1, 1, 1), 2, 1, 1);
 	}
 }
 
@@ -404,4 +425,14 @@ void IN_GAME::RenderMesh(Mesh *mesh, bool enableLight)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+bool IN_GAME::prev_state()
+{
+	return 0;
+}
+
+bool IN_GAME::next_state()
+{
+	return 0;
 }

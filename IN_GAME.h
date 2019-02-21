@@ -4,11 +4,11 @@
 #include "Scene.h"
 #include "MeshBuilder.h"
 #include "MatrixStack.h"
+#include "Player.h"
 #include "Light.h"
 #include "Vehicle.h"
 #include "GameObject.h"
 #include "Environment.h"
-#include "Player.h"
 #include "AIKart.h"
 
 class IN_GAME : public Scene
@@ -21,12 +21,15 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+	virtual bool prev_state();
+	virtual bool next_state();
 	MS modelStack, viewStack, projectionStack;
 	enum GEOMETRY_TYPE
 	{
 		GEO_AXES,
 		//	GEO_SPHERE,
 		GEO_QUAD,
+		GEO_MENU,
 		GEO_KART,
 		GEO_KART2,
 		GEO_KART3,
