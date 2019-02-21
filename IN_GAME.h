@@ -1,36 +1,40 @@
-#ifndef MAINMENU_H
-#define MAINMENU_H
-//
+#ifndef IN_GAME_H
+#define IN_GAME_H
+
 #include "Scene.h"
 #include "MeshBuilder.h"
 #include "MatrixStack.h"
-#include "Player.h"
 #include "Light.h"
-#include "SceneStadium.h"
+#include "Vehicle.h"
+#include "GameObject.h"
+#include "Environment.h"
+#include "Player.h"
+#include "AIKart.h"
 
-class Mainmenu : public Scene
+class IN_GAME : public Scene
 {
 public:
-	Mainmenu();
-	~Mainmenu();
+	IN_GAME();
+	~IN_GAME();
 
 	virtual void Init();
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
-	virtual bool prev_state();
-	virtual bool next_state();
-
 	MS modelStack, viewStack, projectionStack;
 	enum GEOMETRY_TYPE
 	{
 		GEO_AXES,
+		//	GEO_SPHERE,
 		GEO_QUAD,
-		GEO_MENU,
+		GEO_KART,
+		GEO_KART2,
+		GEO_KART3,
+		GEO_KART4,
 		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
-
+	// New to Scene 2
 	enum UNIFORM_TYPE
 	{
 		U_MVP = 0,
@@ -110,22 +114,17 @@ public:
 		U_TEXT_COLOR,
 		U_TOTAL,
 	};
-
 	void RenderMenu(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP);
 
-	bool MainMenu;
-	bool GameMenu;
 	bool CarMenu;
 	bool InMenu;
-	bool closegame;
-	bool nextgame;
 
 private:
 	unsigned m_vertexArrayID;
 	unsigned m_programID;
-
+	// New to scene 2
 	unsigned m_parameters[U_TOTAL];
-
+	bool LightOn;
 	Mesh* meshList[NUM_GEOMETRY];
 	Light lights[5];
 	void RenderMesh(Mesh *mesh, bool enableLight);
@@ -135,11 +134,14 @@ private:
 	double ElapsedTime;
 	double BounceTime;
 
+	int rotateAngle;
+
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 
-	void Quit_Game();
-	void GO_Game();
+	Player Car;
+	AIKart Kart3, Kart4;
+	Environment Seat;
 };
 
 #endif

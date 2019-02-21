@@ -1,4 +1,4 @@
-#include "Mainmenu.h"
+#include "IN_GAME.h"
 #include "GL\glew.h"
 #include <cmath>
 #include "shader.hpp"
@@ -12,37 +12,39 @@
 
 using namespace std;
 
-Mainmenu::Mainmenu()
+IN_GAME::IN_GAME()
 {
-	closegame = false;
 }
 
-Mainmenu::~Mainmenu()
+IN_GAME::~IN_GAME()
 {
 
 }
 
-void Mainmenu::Init()
+void IN_GAME::Init()
 {
-	//Ryan's stuff
-
 	ElapsedTime = 0.0;
 	BounceTime = 0.0;
-	MainMenu = true;
-	GameMenu = false;
-	CarMenu = false;
+	rotateAngle = 0;
+	CarMenu = true;
 	MenuChange = false;
 	InMenu = true;
 
+	// Init VBO here
+	// Set background color to darkblue
 	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //default fill mode
 											   //m_programID = LoadShaders("Shader//TransformVertexShader.vertexshader", "Shader//SimpleFragmentShader.fragmentshader");
 											   // Get a handle for our "MVP" uniform
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
+	// Use our shader
+	//m_programID = LoadShaders("Shader//Texture.vertexshader", "Shader//Blending.fragmentshader");
 	m_programID = LoadShaders("Shader//Texture.vertexshader", "Shader//Text.fragmentshader");
+	//m_programID = LoadShaders("Shader//Texture.vertexshader", "Shader//Texture.fragmentshader");
 	m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
+	//m_programID = LoadShaders("Shader//Shading.vertexshader","Shader//Shading.fragmentshader");
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 	m_parameters[U_MODELVIEW] = glGetUniformLocation(m_programID, "MV");
 	m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE] = glGetUniformLocation(m_programID, "MV_inverse_transpose");
@@ -125,12 +127,14 @@ void Mainmenu::Init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
+	// New to Scene3
 	// Generate a default VAO for now
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", Color(1, 0, 0), 1000, 1000, 1000);
 
+	/*meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Light", Color(0, 0, 0), 1, 36, 18);*/
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("Ground", /*Color(0.23f, 0.33f, 0.14f)*/Color(0, 0, 0), 1, 1);
 	meshList[GEO_QUAD]->textureID = LoadTGA("Image//arrow.tga");
 	meshList[GEO_QUAD]->material.kAmbient.Set(0.5f, 0.5f, 0.5f);
@@ -138,14 +142,21 @@ void Mainmenu::Init()
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_QUAD]->material.kShininess = 0.3f;
 
-	//tga files
-	meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu Background", Color(0, 0, 0), 1, 1);
-	meshList[GEO_MENU]->textureID = LoadTGA("Image//back.tga");
+	// obj files
+	meshList[GEO_KART] = MeshBuilder::GenerateOBJ("Kart", "OBJ//Kart1.obj");
+	meshList[GEO_KART]->textureID = LoadTGA("Image//Kart1.tga");
+	meshList[GEO_KART2] = MeshBuilder::GenerateOBJ("Kart2", "OBJ//Kart2.obj");
+	meshList[GEO_KART2]->textureID = LoadTGA("Image//Kart2.tga");
+	meshList[GEO_KART3] = MeshBuilder::GenerateOBJ("Kart3", "OBJ//Kart3.obj");
+	meshList[GEO_KART3]->textureID = LoadTGA("Image//Kart3.tga");
+	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart4", "OBJ//Kart4.obj");
+	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart4.tga");
 
 	// Text files
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
+	// Make sure you pass uniform parameters after glUseProgram()
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], lights[0].type);
 	glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &lights[0].color.r);
 	glUniform1f(m_parameters[U_LIGHT0_POWER], lights[0].power);
@@ -202,9 +213,10 @@ void Mainmenu::Init()
 
 }
 
-void Mainmenu::Update(double dt)
+void IN_GAME::Update(double dt)
 {
 	ElapsedTime += dt;
+	rotateAngle += dt;
 	if (Application::IsKeyPressed(0x31))
 	{
 		glEnable(GL_CULL_FACE);
@@ -223,31 +235,17 @@ void Mainmenu::Update(double dt)
 	}
 	if (!(BounceTime > ElapsedTime))
 	{
-		if (Application::IsKeyPressed('S') && MainMenu)
-		{
-			MainMenu = false;
-			GameMenu = true;
-		}
-		if (Application::IsKeyPressed('Q') && MainMenu)
-		{
-			Quit_Game();
-		}
-		if (GameMenu)
-		{
-			if (Application::IsKeyPressed('R') || Application::IsKeyPressed('T'))
-			{
-				GameMenu = false;
-				CarMenu = true;
-			}
-			else if (Application::IsKeyPressed('B'))
-			{
-				GameMenu = false;
-				MainMenu = true;
-			}
-		}
 		if (CarMenu)
 		{
-			GO_Game();
+			if ((Application::IsKeyPressed(0x31)) || (Application::IsKeyPressed(0x32)) || (Application::IsKeyPressed(0x33)) || (Application::IsKeyPressed(0x34)))
+			{
+				CarMenu = false;
+				InMenu = false;
+			}
+			else if (Application::IsKeyPressed(0x42))
+			{
+				CarMenu = false;
+			}
 		}
 		MenuChange = true;
 		if (MenuChange)
@@ -256,49 +254,50 @@ void Mainmenu::Update(double dt)
 		}
 	}
 }
-void Mainmenu::Render()
+void IN_GAME::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	viewStack.LoadIdentity();
-
 	modelStack.LoadIdentity();
 	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with new MVP
 																	 //RenderMesh(meshList[GEO_AXES], false);
-
-	Mainmenu::RenderMenu(modelStack, projectionStack, viewStack, MVP);
+	IN_GAME::RenderMenu(modelStack, projectionStack, viewStack, MVP);
 }
 
-void Mainmenu::RenderMenu(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
+void IN_GAME::RenderMenu(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
 {
-	float SKYBOXSIZE = 1500.f;
-	modelStack.PushMatrix();
-	modelStack.Translate(0.f, 0.f, -(SKYBOXSIZE / 2.0f - 0.1f));
-	modelStack.Scale(SKYBOXSIZE, SKYBOXSIZE, SKYBOXSIZE);
-	modelStack.Rotate(180, 0, 1, 0);
-	modelStack.Rotate(90, 1, 0, 0);
-	RenderMesh(meshList[GEO_MENU], false);
-	modelStack.PopMatrix();
-	if (MainMenu && !GameMenu && !CarMenu)
+	if (CarMenu)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "S:Start Game", Color(0, 1, 0), 3, 8, 44 / 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Q:Quit Game", Color(0, 1, 0), 3, 8.5, 24 / 3);
-	}
-	else if (GameMenu && !MainMenu && !CarMenu)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "R:Racing Mode", Color(0, 1, 0), 3, 8, 44 / 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "T:Time Trial", Color(0, 1, 0), 3, 8.5, 24 / 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "B:Back", Color(0, 1, 0), 2, 1, 1);
-	}
-	else if (CarMenu && !MainMenu && !GameMenu)
-	{
+		RenderTextOnScreen(meshList[GEO_TEXT], "Select your vehicle", Color(0, 1, 0), 3, 8, 54 / 3);
+		modelStack.PushMatrix();
+		modelStack.Translate(-15, 0, 0);
+		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		RenderMesh(meshList[GEO_KART], LightOn);
+		modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(-5, 0, 0);
+		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		RenderMesh(meshList[GEO_KART2], LightOn);
+		modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(5, 0, 0);
+		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		RenderMesh(meshList[GEO_KART3], LightOn);
+		modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(15, 0, 0);
+		modelStack.Rotate(rotateAngle, 0, 1, 0);
+		RenderMesh(meshList[GEO_KART4], LightOn);
+		modelStack.PopMatrix();
 		RenderTextOnScreen(meshList[GEO_TEXT], "B:Back", Color(0, 1, 0), 2, 1, 1);
 	}
 }
 
-void Mainmenu::RenderText(Mesh* mesh, std::string text, Color color)
+
+void IN_GAME::RenderText(Mesh* mesh, std::string text, Color color)
 {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
@@ -323,7 +322,7 @@ void Mainmenu::RenderText(Mesh* mesh, std::string text, Color color)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Mainmenu::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
+void IN_GAME::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
 {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
@@ -361,12 +360,12 @@ void Mainmenu::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, flo
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Mainmenu::Exit()
+void IN_GAME::Exit()
 {
 	glDeleteProgram(m_programID);
 }
 
-void Mainmenu::RenderMesh(Mesh *mesh, bool enableLight)
+void IN_GAME::RenderMesh(Mesh *mesh, bool enableLight)
 {
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
@@ -405,24 +404,4 @@ void Mainmenu::RenderMesh(Mesh *mesh, bool enableLight)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-}
-
-void Mainmenu::Quit_Game()
-{
-	closegame = true;
-}
-
-void Mainmenu::GO_Game()
-{
-	nextgame = true;
-}
-
-bool Mainmenu::prev_state()
-{
-	return closegame;
-}
-
-bool Mainmenu::next_state()
-{
-	return nextgame;
 }
