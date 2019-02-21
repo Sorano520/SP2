@@ -1,4 +1,4 @@
-//Include GLEW
+// Include GLEW
 #include <GL/glew.h>
 
 //Include GLFW
@@ -18,8 +18,7 @@ GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 
-										   //Define an error callback
-
+//Define an error callback
 
 static void error_callback(int error, const char* description)
 {
@@ -42,7 +41,7 @@ bool Application::IsKeyPressed(unsigned short key)
 Application::Application()
 {
 	scene[0] = new Mainmenu;
-	scene[1] = new Mainmenu;
+	scene[1] = new IN_GAME;
 	scene[2] = new SceneText;
 	screen_no = 0;
 }
