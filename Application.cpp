@@ -130,24 +130,33 @@ void Application::Run()
 		m_timer.waitUntil(frameTime);// Frame rate limiter. Limits each frame to a specified time in ms.
 		quit_game = scene[screen_no]->prev_state();
 		next = scene[screen_no]->next_state();
-		if (IsKeyPressed(VK_NUMPAD1) == true)
+		if (next == true)
 		{
-			screen_no = 0;
-			Run();
-		}
-		else if (IsKeyPressed(VK_NUMPAD2) == true)
-		{
-			screen_no = 1;
-			Run();
-		}
-		else if (next == true)
-		{
-			screen_no = 2;
-			Run();
+			if (screen_no == 0)
+			{
+				screen_no = 1;
+				Run();
+			}
+			if (screen_no == 1)
+			{
+				screen_no = 2;
+				Run();
+			}
 		}
 		if (quit_game == true)
 		{
-			break;
+			if (screen_no == 0)
+				break;
+			if (screen_no == 1)
+			{
+				screen_no = 0;
+				Run();
+			}
+			if (screen_no == 2)
+			{
+				screen_no = 1;
+				Run();
+			}
 		}
 	} //Check if the ESC key had been pressed or if the window had been closed
 	scene[screen_no]->Exit();
