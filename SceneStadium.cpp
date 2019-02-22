@@ -6,11 +6,13 @@
 #include "Application.h"
 #include "Utility.h"
 #include "LoadTGA.h"
+#include "LapCounter.h"
 #include <string>
 
 SceneText::SceneText()
 {
-	
+	initialspeedZ = 1.f;
+	finalspeedZ = 1.f;
 }
 
 SceneText::~SceneText()
@@ -20,7 +22,10 @@ SceneText::~SceneText()
 
 void SceneText::Init()
 {
-	Lap = 1;
+	//Ryan's stuff
+	ElapsedTime = 0.0;
+
+	Score = 0;
 	Fire = true;
 	BallMove = false;
 	CamIndex = 0;
@@ -29,7 +34,9 @@ void SceneText::Init()
 	LightOn = true;
 	ballRY = 0.f;
 	ballT = 0.f;
-	ElapsedTime = 0.0;
+	
+	Generator.Init("Track//RaceTrack1.txt");
+	BestTime.Print();
 
 	CameraOBJ[0].Set(-19.414f, 3.f, 25.14f, 0.f, -240.f, 0.f);
 	CameraOBJ[1].Set(-20.791f, 3.f, 3.573f, 0.f, -270.f, 0.f);
@@ -168,33 +175,26 @@ void SceneText::Init()
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//bottom.tga");
 
 	// Obj files
-	/*meshList[GEO_SEAT] = MeshBuilder::GenerateOBJ("seat", "OBJ//seat.obj");
-	meshList[GEO_SEAT]->textureID = LoadTGA("Image//seat.tga");
-	meshList[GEO_TRACK] = MeshBuilder::GenerateOBJ("track", "OBJ//track.obj");
-	meshList[GEO_TRACK]->textureID = LoadTGA("Image//track.tga");
-	meshList[GEO_SEATCIRCULAR] = MeshBuilder::GenerateOBJ("seatcircular", "OBJ//seatcircular.obj");
-	meshList[GEO_SEATCIRCULAR]->textureID = LoadTGA("Image//seatcircular.tga");
-	meshList[GEO_CAMERA] = MeshBuilder::GenerateOBJ("camera", "OBJ//camera.obj");
-	meshList[GEO_CAMERA]->textureID = LoadTGA("Image//camera.tga");
-	meshList[GEO_TORCH] = MeshBuilder::GenerateOBJ("torch", "OBJ//torch.obj");
-	meshList[GEO_TORCH]->textureID = LoadTGA("Image//torch.tga");
-	meshList[GEO_MISC] = MeshBuilder::GenerateOBJ("misc", "OBJ//misc.obj");
-	meshList[GEO_MISC]->textureID = LoadTGA("Image//misc.tga");
-	meshList[GEO_GOAL] = MeshBuilder::GenerateOBJ("goal", "OBJ//goal.obj");
-	meshList[GEO_GOAL]->textureID = LoadTGA("Image//goal.tga");
-	meshList[GEO_FIELDGOAL] = MeshBuilder::GenerateOBJ("fieldgoal", "OBJ//fieldgoal.obj");
-	meshList[GEO_FIELDGOAL]->textureID = LoadTGA("Image//fieldgoal.tga");
-	meshList[GEO_LIGHTOBJ] = MeshBuilder::GenerateOBJ("Lightobj", "OBJ//lights.obj");
-	meshList[GEO_LIGHTOBJ]->textureID = LoadTGA("Image//lights.tga");
-	meshList[GEO_SOCCERBALL] = MeshBuilder::GenerateOBJ("ball", "OBJ//ball.obj");
-	meshList[GEO_SOCCERBALL]->textureID = LoadTGA("Image//ball.tga");
-	meshList[GEO_FOOTBALL] = MeshBuilder::GenerateOBJ("football", "OBJ//football.obj");
-	meshList[GEO_FOOTBALL]->textureID = LoadTGA("Image//football.tga");
-	meshList[GEO_GROUND] = MeshBuilder::GenerateQuad("Ground", Color(0, 0, 0), 1, 1);
-	meshList[GEO_GROUND]->textureID = LoadTGA("Image//camera.tga");
-	meshList[GEO_CHARACTER] = MeshBuilder::GenerateOBJ("character", "OBJ//character.obj");
-	meshList[GEO_CHARACTER]->textureID = LoadTGA("Image//character.tga");
-	*/meshList[GEO_KART] = MeshBuilder::GenerateOBJ("Kart", "OBJ//Kart1.obj");
+
+	//meshList[GEO_TRACK] = MeshBuilder::GenerateOBJ("track", "OBJ//RaceTrack2.obj");
+	//meshList[GEO_TRACK]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_B_0] = MeshBuilder::GenerateOBJ("Track_B_0", "OBJ//RaceTrack_B_0.obj");
+	meshList[GEO_TRACK_B_0]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_B_1] = MeshBuilder::GenerateOBJ("Track_B_1", "OBJ//RaceTrack_B_1.obj");
+	meshList[GEO_TRACK_B_1]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_B_2] = MeshBuilder::GenerateOBJ("Track_B_2", "OBJ//RaceTrack_B_2.obj");
+	meshList[GEO_TRACK_B_2]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_B_3] = MeshBuilder::GenerateOBJ("Track_B_3", "OBJ//RaceTrack_B_3.obj");
+	meshList[GEO_TRACK_B_3]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_S_0] = MeshBuilder::GenerateOBJ("Track_S_0", "OBJ//RaceTrack_S_0.obj");
+	meshList[GEO_TRACK_S_0]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_S_1] = MeshBuilder::GenerateOBJ("Track_S_1", "OBJ//RaceTrack_S_1.obj");
+	meshList[GEO_TRACK_S_1]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_S_2] = MeshBuilder::GenerateOBJ("Track_S_2", "OBJ//RaceTrack_S_2.obj");
+	meshList[GEO_TRACK_S_2]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_TRACK_S_3] = MeshBuilder::GenerateOBJ("Track_S_3", "OBJ//RaceTrack_S_3.obj");
+	meshList[GEO_TRACK_S_3]->textureID = LoadTGA("Image//RaceTrack1.tga");
+	meshList[GEO_KART] = MeshBuilder::GenerateOBJ("Kart", "OBJ//Kart1.obj");
 	meshList[GEO_KART]->textureID = LoadTGA("Image//Kart1.tga");
 	meshList[GEO_KART2] = MeshBuilder::GenerateOBJ("Kart2", "OBJ//Kart2.obj");
 	meshList[GEO_KART2]->textureID = LoadTGA("Image//Kart2.tga");
@@ -202,15 +202,57 @@ void SceneText::Init()
 	meshList[GEO_KART3]->textureID = LoadTGA("Image//Kart3.tga");
 	meshList[GEO_KART4] = MeshBuilder::GenerateOBJ("Kart4", "OBJ//Kart4.obj");
 	meshList[GEO_KART4]->textureID = LoadTGA("Image//Kart4.tga");
+	meshList[GEO_BARRICADE] = MeshBuilder::GenerateOBJ("Barricade", "OBJ//SP2_Barricade.obj");
+	meshList[GEO_BARRICADE]->textureID = LoadTGA("Image//SP2_Barricade_Texture_Color.tga");/*
+	meshList[GEO_ITEM] = MeshBuilder::GenerateOBJ("Item", "OBJ//item.obj");
+	meshList[GEO_ITEM]->textureID = LoadTGA("Image//item.tga");*/
 
 	Car.Init(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0), 0.f);
 	Car.setHitBox(meshList[GEO_KART]->XCoord, meshList[GEO_KART]->YCoord, meshList[GEO_KART]->ZCoord);
 	Seat.Init(Vector3(10, 0, 0));
 	Seat.setHitBox(meshList[GEO_KART2]->XCoord, meshList[GEO_KART2]->YCoord, meshList[GEO_KART2]->ZCoord);
-	Kart3.Init(Vector3(-10, 0, 0), Vector3(-10, 0, 1), Vector3(0, 1, 0), 0.f);
+	Kart3.Init(Vector3(0, 0, -200), Vector3(0, 0, -199), Vector3(0, 1, 0), 0.5f);
 	Kart3.setHitBox(meshList[GEO_KART3]->XCoord, meshList[GEO_KART3]->YCoord, meshList[GEO_KART3]->ZCoord);
 	Kart4.Init(Vector3(0, 0, 10), Vector3(0, 0, 11), Vector3(0, 1, 0), 0.f);
 	Kart4.setHitBox(meshList[GEO_KART4]->XCoord, meshList[GEO_KART4]->YCoord, meshList[GEO_KART4]->ZCoord);
+	Barricade.Init(Vector3(2.864, 0, 34.103));
+	Barricade.setHitBox(meshList[GEO_BARRICADE]->XCoord, meshList[GEO_BARRICADE]->YCoord, meshList[GEO_BARRICADE]->ZCoord);
+	Barricade2.Init(Vector3(-2.88, 0, 36.9));
+	Barricade2.setHitBox(meshList[GEO_BARRICADE]->XCoord, meshList[GEO_BARRICADE]->YCoord, meshList[GEO_BARRICADE]->ZCoord);
+
+	for (int b = 0; b < Generator.getNumofPiece(); b++)
+	{
+		switch (Generator.getType(b))
+		{
+		case 0:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_B_0]->XCoord, meshList[GEO_TRACK_B_0]->YCoord, meshList[GEO_TRACK_B_0]->ZCoord);
+			break;
+		case 1:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_B_1]->XCoord, meshList[GEO_TRACK_B_1]->YCoord, meshList[GEO_TRACK_B_1]->ZCoord);
+			break;
+		case 2:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_B_2]->XCoord, meshList[GEO_TRACK_B_2]->YCoord, meshList[GEO_TRACK_B_2]->ZCoord);
+			break;
+		case 3:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_B_3]->XCoord, meshList[GEO_TRACK_B_3]->YCoord, meshList[GEO_TRACK_B_3]->ZCoord);
+			break;
+		case 10:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_S_0]->XCoord, meshList[GEO_TRACK_S_0]->YCoord, meshList[GEO_TRACK_S_0]->ZCoord);
+			break;
+		case 11:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_S_1]->XCoord, meshList[GEO_TRACK_S_1]->YCoord, meshList[GEO_TRACK_S_1]->ZCoord);
+			break;
+		case 12:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_S_2]->XCoord, meshList[GEO_TRACK_S_2]->YCoord, meshList[GEO_TRACK_S_2]->ZCoord);
+			break;
+		case 13:
+			Generator.getTrackObject()[b].setHitBox(meshList[GEO_TRACK_S_3]->XCoord, meshList[GEO_TRACK_S_3]->YCoord, meshList[GEO_TRACK_S_3]->ZCoord);
+			break;
+		default: break;
+		}
+	}
+
+	LapCounter::SetRange(Generator);
 
 	// Text files
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
@@ -304,8 +346,8 @@ void SceneText::Init()
 
 	lights[4].type = Light::LIGHT_POINT;
 	lights[4].position.Set(-6.276, 7.312, -28.658);
-	lights[4].color.Set(1, 0, 0);
-	lights[4].power = 1.f;
+	lights[4].color.Set(1, 1, 1);
+	lights[4].power = 0.5f;
 	lights[4].kC = 1.f;
 	lights[4].kL = 0.01f;
 	lights[4].kQ = 0.001f;
@@ -373,8 +415,7 @@ void SceneText::Init()
 
 void SceneText::Update(double dt)
 {
-	ElapsedTime += dt;
-	DeltaTime = dt;
+	finalspeedZ = Car.SpeedZAxis;
 	float LSPEED = 25.f;
 	if (Application::IsKeyPressed(0x31))
 	{
@@ -400,180 +441,44 @@ void SceneText::Update(double dt)
 	{
 		LightOn = false; // Lighting OFF
 	}
-	if (camera.position.x <= 1.5 && camera.position.x >= -1.5
-		&& camera.position.z <= 1.5 && camera.position.z >= -1.5
-		&& Application::IsKeyPressed('E') && (((SwitchField - 1) % 3 == 1) || ((SwitchField - 1) % 3 == 2))
-		&& !camera.OtherCam) // INTERACT CHECK
+	if (initialspeedZ / finalspeedZ != 1.f && finalspeedZ != 0)
 	{
-		camera.Shoot = true;
-		camera.position.x = camera.position.z = 0.f;
-		camera.target = camera.defaultTarget;
-		camera.up = camera.defaultUp;
-	}
-	if (Application::IsKeyPressed('G') && (!camera.Shoot)) // CHANGING FIELDS
-	{
-		switch (SwitchField % 3)
-		{
-		case 0:
-			meshList[GEO_TRACK]->textureID = LoadTGA("Image//track.tga");
-			break;
-		case 1:
-			meshList[GEO_TRACK]->textureID = LoadTGA("Image//track2.tga");
-			break;
-		case 2:
-			meshList[GEO_TRACK]->textureID = LoadTGA("Image//track3.tga");
-			break;
-		default:
-			meshList[GEO_TRACK]->textureID = LoadTGA("Image//track.tga");
-			break;
-		}
-		SwitchField++;
-	}
-	//if (camera.Shoot)
-	//{
-	//	if (Application::IsKeyPressed('Q')) // QUIT INTERACTION
-	//	{
-	//		ballRY = 0;
-	//		camera.Shoot = false;
-	//		camera.target = camera.defaultTarget;
-	//		camera.up = camera.defaultUp;
-	//	}
-	//	if (Application::IsKeyPressed('C')) // SHOOT BALL
-	//	{
-	//		BallMove = true;
-	//	}
-	//	if (Application::IsKeyPressed(VK_LEFT)) // LOOK LEFT
-	//	{
-	//		if (ballRY <= 50)
-	//		{
-	//			ballRY += (float)(LSPEED * dt);
-	//		}
-	//	}
-	//	if (Application::IsKeyPressed(VK_RIGHT)) // LOOK RIGHT
-	//	{
-	//		if (ballRY >= -50)
-	//		{
-	//			ballRY -= (float)(LSPEED * dt);
-	//		}
-	//	}
-	//	if (BallMove) // WHEN BALL IS MOVING
-	//	{
-	//		if (ballT <= 13)
-	//		{
-	//			ballT += 0.5;
-	//		}
-	//		else
-	//		{
-	//			if (ballRY >= -5.0f && ballRY <= 5.0f)
-	//			{
-	//				Score++;
-	//			}
-	//			ballT = 0;
-	//			BallMove = false;
-	//		}
-	//	}
-	//}
-	if (Application::IsKeyPressed('F')) // FIRE ON AND OFF
-	{
-		if (!Fire)
-		{
-			Fire = true;
-			lights[4].power = 1.f;
-			lights[4].type = Light::LIGHT_DIRECTIONAL;
-			glUniform1i(m_parameters[U_LIGHT4_TYPE], lights[4].type);
-			glUniform1f(m_parameters[U_LIGHT4_POWER], lights[4].power);
-		}
-		else
-		{
-			Fire = false;
-			lights[4].power = 0.f;
-			lights[4].type = Light::LIGHT_DIRECTIONAL;
-			glUniform1i(m_parameters[U_LIGHT4_TYPE], lights[4].type);
-			glUniform1f(m_parameters[U_LIGHT4_POWER], lights[4].power);
-		}
-	}
-	if (Application::IsKeyPressed('C') && !camera.Shoot) // ENTER FIXED CAMERA
-	{
-		int temp = CamIndex % 7;
-		camera.OtherCam = true;
-		camera.position.Set(CameraOBJ[temp].getX(), CameraOBJ[temp].getY() + 2, CameraOBJ[temp].getZ());
-		CamIndex++;
-	}
-	if (Application::IsKeyPressed('V') && !camera.Shoot && camera.OtherCam) // QUIT FIXED CAMERA
-	{
-		camera.OtherCam = false;
-		camera.Reset();
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD1)) // FIXED CAM 1 - 8
-	{
-		camera.position.Set(CameraOBJ[0].getX(), CameraOBJ[0].getY() + 2, CameraOBJ[0].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD2))
-	{
-		camera.position.Set(CameraOBJ[1].getX(), CameraOBJ[1].getY() + 2, CameraOBJ[1].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD3))
-	{
-		camera.position.Set(CameraOBJ[2].getX(), CameraOBJ[2].getY() + 2, CameraOBJ[2].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD4))
-	{
-		camera.position.Set(CameraOBJ[3].getX(), CameraOBJ[3].getY() + 2, CameraOBJ[3].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD5))
-	{
-		camera.position.Set(CameraOBJ[4].getX(), CameraOBJ[4].getY() + 2, CameraOBJ[4].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD6))
-	{
-		camera.position.Set(CameraOBJ[5].getX(), CameraOBJ[5].getY() + 2, CameraOBJ[5].getZ());
-		camera.OtherCam = true;
-	}
-	if (Application::IsKeyPressed(VK_NUMPAD7))
-	{
-		camera.position.Set(CameraOBJ[6].getX(), CameraOBJ[6].getY() + 2, CameraOBJ[6].getZ());
-		camera.OtherCam = true;
-	}
-	if (camera.OtherCam)
-	{
-		CharPos.x = 0;
-		CharPos.y = 0;
-		CharPos.z = 0;
+		mciSendString("play Music/car_sound.wav", NULL, 0, NULL);
+		initialspeedZ = finalspeedZ;
 	}
 	else
 	{
-		CharPos.x = camera.position.x;
-		CharPos.y = camera.position.y;
-		CharPos.z = camera.position.z;
-	}
-	if (Application::IsKeyPressed(VK_LEFT)) // LOOK LEFT
-	{
-		if (ballRY <= 50)
-		{
-			ballRY += (float)(LSPEED * dt);
-		}
-	}
-	if (Application::IsKeyPressed(VK_RIGHT)) // LOOK RIGHT
-	{
-		if (ballRY >= -50)
-		{
-			ballRY -= (float)(LSPEED * dt);
-		}
+		mciSendString("stop Music/car_sound.wav", NULL, 0, NULL);
 	}
 	Car.Collision(Kart3);
 	Car.Collision(Kart4);
+	Car.Collision(Seat);
+	Kart3.Collision(Kart4);
+	Kart4.CheckCar();
+	Kart3.CheckCar();
 	Car.Update(dt);
 	Kart3.Update(dt);
 	Kart4.Update(dt);
+	BestTime.TimeCheck();
 	camera.Update(dt, Car);
 	FPS = 1.0 / dt;
-}
+	ElapsedTime += dt;
+	switch (Car.CheckCar())
+	{
+	case 1:
+		Car.Collision(Barricade2);
+		break;
+	case 2:
+		Car.Collision(Barricade);
+		break;
+	case 3:
 
+		break;
+	default:
+
+		break;
+	}
+}
 void SceneText::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -696,8 +601,6 @@ void SceneText::Render()
 	//SceneText::RenderStadium(modelStack, projectionStack, viewStack, MVP);
 	modelStack.PushMatrix();
 		modelStack.Translate(Car.getPosition().x, Car.getPosition().y, Car.getPosition().z);
-		//modelStack.Rotate(Car.getTargetX(), 0, 1, 0);
-		//modelStack.Rotate((Car.getTargetZ() - Car.getZ()) * 90, 0, 1, 0);
 		modelStack.Rotate(Car.getRotateValue(), 0, 1, 0);
 		RenderMesh(meshList[GEO_KART], LightOn);
 	modelStack.PopMatrix();
@@ -707,12 +610,73 @@ void SceneText::Render()
 	modelStack.PopMatrix();
 	modelStack.PushMatrix();
 		modelStack.Translate(Kart3.getPosition().x, Kart3.getPosition().y, Kart3.getPosition().z);
+		modelStack.Rotate(Kart3.getRotateValue(), 0, 1, 0);
 		RenderMesh(meshList[GEO_KART3], LightOn);
 	modelStack.PopMatrix();
 	modelStack.PushMatrix();
 		modelStack.Translate(Kart4.getPosition().x, Kart4.getPosition().y, Kart4.getPosition().z);
+		modelStack.Rotate(Kart4.getRotateValue(), 0, 1, 0);
 		RenderMesh(meshList[GEO_KART4], LightOn);
 	modelStack.PopMatrix();
+	for (int Index = 0; Index < Generator.getNumofPiece(); Index++)
+	{
+		modelStack.PushMatrix();
+			modelStack.Translate(Generator.getTrackObject()[Index].getPosition().x, Generator.getTrackObject()[Index].getPosition().y, Generator.getTrackObject()[Index].getPosition().z);
+			modelStack.Rotate(Generator.getRotateValue()[Index], 0, 1, 0);
+			switch (Generator.getType(Index))
+			{
+			case 0:
+				RenderMesh(meshList[GEO_TRACK_B_0], LightOn);
+				break;
+			case 1:
+				RenderMesh(meshList[GEO_TRACK_B_1], LightOn);
+				break;
+			case 2:
+				RenderMesh(meshList[GEO_TRACK_B_2], LightOn);
+				break;
+			case 3:
+				RenderMesh(meshList[GEO_TRACK_B_3], LightOn);
+				break;
+			case 10:
+				RenderMesh(meshList[GEO_TRACK_S_0], LightOn);
+				break;
+			case 11:
+				RenderMesh(meshList[GEO_TRACK_S_1], LightOn);
+				break;
+			case 12:
+				RenderMesh(meshList[GEO_TRACK_S_2], LightOn);
+				break;
+			case 13:
+				RenderMesh(meshList[GEO_TRACK_S_3], LightOn);
+				break;
+			default: break;
+			}
+		modelStack.PopMatrix();
+	}/*
+	modelStack.PushMatrix();
+		RenderMesh(meshList[GEO_ITEM], LightOn);
+	modelStack.PopMatrix();*/
+	switch (Car.CheckCar())
+	{
+	case 1:
+		modelStack.PushMatrix();
+			modelStack.Translate(Barricade2.getPosition().x, Barricade2.getPosition().y, Barricade2.getPosition().z);
+			RenderMesh(meshList[GEO_BARRICADE], LightOn);
+		modelStack.PopMatrix();
+		break;
+	case 2:
+		modelStack.PushMatrix();
+			modelStack.Translate(Barricade.getPosition().x, Barricade.getPosition().y, Barricade.getPosition().z);
+			RenderMesh(meshList[GEO_BARRICADE], LightOn);
+		modelStack.PopMatrix();
+		break;
+	case 3:
+
+		break;
+	default:
+
+		break;
+	}
 	SceneText::RenderInformation(modelStack, projectionStack, viewStack, MVP);
 }
 void SceneText::RenderStadium(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
@@ -806,52 +770,37 @@ void SceneText::RenderStadium(MS &modelStack, MS &projectionStack, MS &viewStack
 
 void SceneText::RenderInformation(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
 {
-	double InitialTime = 90.f;
+	double InitialTime = 90.0;
+	double LapTime = 0.0;
 	InitialTime -= ElapsedTime;
+	LapTime += ElapsedTime;
 	RenderTextOnScreen(meshList[GEO_TEXT], "FPS:" + std::to_string(FPS), Color(1, 0, 0), 1, 2, 59);
-	RenderTextOnScreen(meshList[GEO_TEXT], "Lap:" + std::to_string(Lap) + "/3", Color(1, 0, 0), 2, 1, 58 / 2);
-	if (InitialTime < 10)
+	RenderTextOnScreen(meshList[GEO_TEXT], "Lap:" + std::to_string(Car.LapCheck.getCurrentLap()) + "/3", Color(1, 0, 0), 2, 1, 58 / 2);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Checkpoint num:" + std::to_string(Car.LapCheck.getCurrentCheckPoint()) , Color(1, 0, 0), 2, 1, 56 / 2);
+	if (InitialTime > 0)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "Time:" + std::to_string(InitialTime), Color(1, 0, 0), 2, 27, 58 / 2);
+		if (InitialTime < 10)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Time Left:" + std::to_string(InitialTime), Color(1, 0, 0), 2, 20, 58 / 2);
+		}
+		else if (InitialTime >= 10 && InitialTime < 100)
+		{
+			RenderTextOnScreen(meshList[GEO_TEXT], "Time Left:" + std::to_string(InitialTime), Color(1, 0, 0), 2, 21, 58 / 2);
+		}
 	}
-	else if (InitialTime >= 10 && InitialTime < 100)
+	if (LapTime < 10)
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "Time:" + std::to_string(InitialTime), Color(1, 0, 0), 2, 26, 58 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time:" + std::to_string(LapTime), Color(1, 0, 0), 2, 27, 48 / 2);
 	}
-	if ((((SwitchField - 1) % 3 == 1) || ((SwitchField - 1) % 3 == 2))
-		&& camera.position.x <= 1.5 && camera.position.x >= -1.5
-		&& camera.position.z <= 1.5 && camera.position.z >= -1.5 && !camera.Shoot)
+	else if ((LapTime >= 10 && LapTime < 100))
 	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "C:Cycle camera", Color(1, 0, 0), 2, 1, 56 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "E:Interact", Color(1, 0, 0), 2, 1, 54 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "G:Change Field", Color(1, 0, 0), 2, 1, 52 / 2);
-	}
-	else if (camera.Shoot)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "C:Shoot", Color(1, 0, 0), 2, 1, 56 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Q:Quit", Color(1, 0, 0), 2, 1, 54 / 2);
-	}
-	else if (camera.OtherCam)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "C:Cycle camera", Color(1, 0, 0), 2, 1, 56 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "V:Quit", Color(1, 0, 0), 2, 1, 54 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "G:Change Field", Color(1, 0, 0), 2, 1, 52 / 2);
-	}
-	else
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "C:Cycle camera", Color(1, 0, 0), 2, 1, 56 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], "G:Change Field", Color(1, 0, 0), 2, 1, 54 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getPosition().x - Car.getTarget().x), Color(1, 0, 0), 2, 1, 52 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getTarget().z - Car.getPosition().z), Color(1, 0, 0), 2, 1, 50 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.getRotateValue()), Color(1, 0, 0), 2, 1, 44 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.dist), Color(1, 0, 0), 2, 1, 42 / 2);
-		RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(Car.distcheck), Color(1, 0, 0), 2, 1, 40 / 2);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Time:" + std::to_string(LapTime), Color(1, 0, 0), 2, 26, 48 / 2);
 	}
 }
 
 void SceneText::RenderSkybox(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
 {
-	float SKYBOXSIZE = 1000.f;
+	float SKYBOXSIZE = 1500.f;
 	modelStack.PushMatrix();
 		modelStack.Translate(0.f, 0.f, SKYBOXSIZE / 2.0f - 0.1f);
 		modelStack.Scale(SKYBOXSIZE, SKYBOXSIZE, SKYBOXSIZE);
@@ -999,4 +948,14 @@ void SceneText::RenderMesh(Mesh *mesh, bool enableLight)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+bool SceneText::prev_state()
+{
+	return 0;
+}
+
+bool SceneText::next_state()
+{
+	return 0;
 }

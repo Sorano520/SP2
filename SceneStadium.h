@@ -14,8 +14,8 @@
 #include "Environment.h"
 #include "Player.h"
 #include "AIKart.h"
-#include "timer.h"
-#include <string>
+#include "TrackMaker.h"
+#include "PersonalBest.h"
 
 class SceneText : public Scene
 {
@@ -27,6 +27,8 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+	virtual bool prev_state();
+	virtual bool next_state();
 	MS modelStack, viewStack, projectionStack;
 	enum GEOMETRY_TYPE
 	{
@@ -40,7 +42,6 @@ public:
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
-		GEO_SOCCERFIELD,
 		GEO_BACK,
 		GEO_SEAT,
 		GEO_TRACK,
@@ -56,10 +57,20 @@ public:
 		GEO_FOOTBALL,
 		GEO_GROUND,
 		GEO_CHARACTER,
-		GEO_KART,
-		GEO_KART2,
-		GEO_KART3,
-		GEO_KART4,
+		GEO_KART,  // Rocket
+		GEO_KART2, // Red
+		GEO_KART3, // Blue
+		GEO_KART4, // Cylinder
+		GEO_ITEM,
+		GEO_TRACK_B_0, // Normal
+		GEO_TRACK_B_1, // Turn 15 Degree Left
+		GEO_TRACK_B_2, // Turn 15 Degree Right
+		GEO_TRACK_B_3, // Expanding / Decreasing
+		GEO_TRACK_S_0, // Normal
+		GEO_TRACK_S_1, // Turn 15 Degree Left
+		GEO_TRACK_S_2, // Turn 15 Degree Right
+		GEO_TRACK_S_3, // Normal Extended
+		GEO_BARRICADE,
 		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
@@ -148,7 +159,6 @@ public:
 	void RenderInformation(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP);
 	void RenderSkybox(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP);
 	PositionCameraOBJ CameraOBJ[7];
-	StopWatch g_swTimer;
 private:
 	unsigned m_vertexArrayID;
 	unsigned m_programID;
@@ -170,10 +180,8 @@ private:
 
 	double Buffer;
 	double FPS;
-	double ElapsedTime;
-	double DeltaTime;
 
-	int Lap;
+	int Score;
 
 	Vector3 CharPos;
 
@@ -183,6 +191,13 @@ private:
 	Player Car;
 	AIKart Kart3, Kart4;
 	Environment Seat;
+	Environment Barricade, Barricade2;
+	TrackMaker Generator;
+	PersonalBest BestTime;
+	//LapCounter Lap;
+	double ElapsedTime;
+
+	float initialspeedZ, finalspeedZ;
 };
 
 #endif
