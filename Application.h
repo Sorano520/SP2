@@ -18,7 +18,7 @@ public:
 	void Music(int);
 	static bool IsKeyPressed(unsigned short key);
 
-	Scene *scene[3];
+	Scene *scene[4];
 private:
 
 	//Declare a window object

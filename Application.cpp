@@ -13,6 +13,7 @@
 #include "SceneStadium.h"
 #include "IN_GAME.h"
 #include "Mainmenu.h"
+#include "Pausemenu.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -40,9 +41,6 @@ bool Application::IsKeyPressed(unsigned short key)
 
 Application::Application()
 {
-	scene[0] = new Mainmenu;
-	scene[1] = new IN_GAME;
-	scene[2] = new SceneText;
 	screen_no = 0;
 }
 
@@ -111,6 +109,10 @@ void Application::Init()
 
 void Application::Run()
 {
+	scene[0] = new Mainmenu;
+	scene[1] = new IN_GAME;
+	scene[2] = new SceneText;
+	scene[3] = new Pausemenu;
 	//Main Loop
 	bool quit_game = false;
 	bool next = false;
@@ -119,7 +121,7 @@ void Application::Run()
 	scene[screen_no]->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
-	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
+	while (!glfwWindowShouldClose(m_window))
 	{
 		scene[screen_no]->Update(m_timer.getElapsedTime());
 		scene[screen_no]->Render();
@@ -128,7 +130,7 @@ void Application::Run()
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...
 		glfwPollEvents();
 		m_timer.waitUntil(frameTime);// Frame rate limiter. Limits each frame to a specified time in ms.
-		quit_game = scene[screen_no]->prev_state();
+		
 		next = scene[screen_no]->next_state();
 		if (next == true)
 		{
@@ -142,7 +144,14 @@ void Application::Run()
 				screen_no = 2;
 				Run();
 			}
+			if (screen_no == 3)
+			{
+				screen_no = 2;
+				Run();
+			}
 		}
+
+		quit_game = scene[screen_no]->prev_state();
 		if (quit_game == true)
 		{
 			if (screen_no == 0)
@@ -154,7 +163,12 @@ void Application::Run()
 			}
 			if (screen_no == 2)
 			{
-				screen_no = 1;
+				screen_no = 3;
+				Run();
+			}
+			if (screen_no == 3)
+			{
+				screen_no = 0;
 				Run();
 			}
 		}

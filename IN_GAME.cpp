@@ -414,7 +414,7 @@ void IN_GAME::RenderMesh(Mesh *mesh, bool enableLight)
 void IN_GAME::Quit_Game()
 {
 	closegame = true;
-	nextgame = false;
+	nextgame = false;                      
 }
 
 void IN_GAME::GO_Game()
