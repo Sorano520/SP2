@@ -441,6 +441,10 @@ void SceneText::Update(double dt)
 	{
 		LightOn = false; // Lighting OFF
 	}
+	if (Application::IsKeyPressed(VK_BACK))
+	{
+		Quit_Game();
+	}
 	if (initialspeedZ / finalspeedZ != 1.f && finalspeedZ != 0)
 	{
 		mciSendString("play Music/car_sound.wav", NULL, 0, NULL);
@@ -950,12 +954,24 @@ void SceneText::RenderMesh(Mesh *mesh, bool enableLight)
 	}
 }
 
+void SceneText::Quit_Game()
+{
+	closegame = true;
+	nextgame = false;
+}
+
+void SceneText::GO_Game()
+{
+	nextgame = true;
+	closegame = false;
+}
+
 bool SceneText::prev_state()
 {
-	return 0;
+	return closegame;
 }
 
 bool SceneText::next_state()
 {
-	return 0;
+	return nextgame;
 }

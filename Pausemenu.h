@@ -18,12 +18,16 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+	virtual bool prev_state();
+	virtual bool next_state();
+
 
 	MS modelStack, viewStack, projectionStack;
 	enum GEOMETRY_TYPE
 	{
 		GEO_AXES,
 		GEO_QUAD,
+		GEO_MENU,
 		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
@@ -132,9 +136,14 @@ private:
 
 	double ElapsedTime;
 	double BounceTime;
+	bool closegame = true;
+	bool nextgame = true;
 
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+	
+	void Quit_Game();
+	void GO_Game();
 };
 
 #endif

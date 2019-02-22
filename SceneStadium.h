@@ -177,6 +177,8 @@ private:
 
 	bool Fire;
 	bool BallMove;
+	bool closegame = true;
+	bool nextgame = true;
 
 	double Buffer;
 	double FPS;
@@ -187,6 +189,9 @@ private:
 
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+
+	void Quit_Game();
+	void GO_Game();
 
 	Player Car;
 	AIKart Kart3, Kart4;

@@ -143,6 +143,10 @@ void Pausemenu::Init()
 	meshList[GEO_QUAD]->material.kSpecular.Set(0.2f, 0.2f, 0.2f);
 	meshList[GEO_QUAD]->material.kShininess = 0.3f;
 
+	// tga files
+	meshList[GEO_MENU] = MeshBuilder::GenerateQuad("Menu Background", Color(0, 0, 0), 1, 1);
+	meshList[GEO_MENU]->textureID = LoadTGA("Image//back.tga");
+
 	// Text files
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
@@ -225,11 +229,7 @@ void Pausemenu::Update(double dt)
 	}
 	if (!(BounceTime > ElapsedTime))
 	{
-		if (Application::IsKeyPressed(0x52))
-		{
-			PauseMenu = false;
-		}
-		else if (Application::IsKeyPressed(0x51))
+		if (Application::IsKeyPressed(0x52) || Application::IsKeyPressed(0x51))
 		{
 			PauseMenu = false;
 		}
@@ -258,11 +258,16 @@ void Pausemenu::Render()
 
 void Pausemenu::RenderMenu(MS &modelStack, MS &projectionStack, MS &viewStack, Mtx44 &MVP)
 {
-	if (PauseMenu)
-	{
-		RenderTextOnScreen(meshList[GEO_TEXT], "R:Resume", Color(0, 1, 0), 3, 8, 44 / 3);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Q:Quit Race", Color(0, 1, 0), 3, 8.5, 24 / 3);
-	}
+	float SKYBOXSIZE = 1500.f;
+	modelStack.PushMatrix();
+	modelStack.Translate(0.f, 0.f, -(SKYBOXSIZE / 2.0f - 0.1f));
+	modelStack.Scale(SKYBOXSIZE, SKYBOXSIZE, SKYBOXSIZE);
+	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Rotate(90, 1, 0, 0);
+	RenderMesh(meshList[GEO_MENU], false);
+	modelStack.PopMatrix();
+	RenderTextOnScreen(meshList[GEO_TEXT], "R:Resume", Color(1, 1, 1), 3, 9, 44 / 3);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Q:Quit Race", Color(1, 1, 1), 3, 8, 24 / 3);
 }
 
 void Pausemenu::RenderText(Mesh* mesh, std::string text, Color color)
@@ -372,4 +377,26 @@ void Pausemenu::RenderMesh(Mesh *mesh, bool enableLight)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+void Pausemenu::Quit_Game()
+{
+	closegame = true;
+	nextgame = false;
+}
+
+void Pausemenu::GO_Game()
+{
+	nextgame = true;
+	closegame = false;
+}
+
+bool Pausemenu::prev_state()
+{
+	return closegame;
+}
+
+bool Pausemenu::next_state()
+{
+	return nextgame;
 }
